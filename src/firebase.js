@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB2rGPkwIw82TCWEBThj863LNRapx-k9Jc",
+  apiKey: process.env.APIKEY,
   authDomain: "invoice-app-9a687.firebaseapp.com",
   projectId: "invoice-app-9a687",
   storageBucket: "invoice-app-9a687.appspot.com",
