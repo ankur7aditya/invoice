@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { auth, storage } from "../../firebase";
+import { Link, useNavigate } from "react-router-dom";
+import { auth, storage, db } from "../../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { setDoc ,doc} from "firebase/firestore";
 
 function Signup() {
   const [email, setEmail] = new useState("");
   const [password, setPassword] = new useState("");
   const [companyName, setCompanyName] = new useState("");
   const [file, setFile] = new useState(null);
+  const navigate = useNavigate();
 
   const handleSumbit = (e) => {
     e.preventDefault();
@@ -25,6 +27,13 @@ function Signup() {
               displayName: companyName,
               photoURL: url,
             });
+            setDoc(doc(db, "users", newUser.user.uid), {
+              uid: newUser.user.uid,
+              displayName: companyName,
+              email: email,
+              photoURL: url,
+            });
+            navigate('dashboard');
           });
         });
       })

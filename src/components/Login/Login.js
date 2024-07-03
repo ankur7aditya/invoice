@@ -1,7 +1,21 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
+  const [email, setEmail] = new useState("");
+  const [password, setPassword] = new useState("");
+  const navigate = useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log(userCredential.user);
+        navigate("dashboard");
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <>
       <div className="bg-gray-100 flex justify-center items-center h-screen">
@@ -15,8 +29,8 @@ function Login() {
         </div>
         {/* <!-- Right: Login Form --> */}
         <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
-            <h1 className="text-4xl mb-5 font-bold">Invoice Management</h1>
-          <form action="#" method="POST">
+          <h1 className="text-4xl mb-5 font-bold">Invoice Management</h1>
+          <form onSubmit={handleSubmit}>
             {/* <!-- Username Input --> */}
             <div className="mb-4">
               <label htmlFor="username" className="block text-gray-600">
@@ -26,6 +40,9 @@ function Login() {
                 type="text"
                 id="username"
                 name="username"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 autoComplete="off"
               />
@@ -39,6 +56,9 @@ function Login() {
                 type="password"
                 id="password"
                 name="password"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
                 autoComplete="off"
               />
