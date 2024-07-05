@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes,Route } from "react-router-dom";
+import { BrowserRouter as Router,Navigate, Routes,Route } from "react-router-dom";
 import DashBoard from "./components/DashBoard/DashBoard";
 import Login from "./components/Login/Login";
 import Signup from "./components/Signup/Signup";
@@ -21,7 +21,7 @@ const App = () => {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          {/* <Route path="*" element={<Navigate to="/login"/>} /> */}
+          <Route path="*" element={<Navigate to="/login"/>} />
         </Routes>
     </Router>
   );
