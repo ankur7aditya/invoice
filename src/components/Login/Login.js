@@ -12,7 +12,9 @@ function Login() {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential.user);
-        navigate("dashboard");
+        localStorage.setItem("user", userCredential.user.displayName);
+        localStorage.setItem("logo", userCredential.user.photoURL);
+        navigate("/dashboard");
       })
       .catch((err) => console.log(err));
   };

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, storage, db } from "../../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { setDoc ,doc} from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 
 function Signup() {
   const [email, setEmail] = new useState("");
@@ -33,7 +33,9 @@ function Signup() {
               email: email,
               photoURL: url,
             });
-            navigate('dashboard');
+            localStorage.setItem("user", newUser.user.displayName);
+            localStorage.setItem("logo", newUser.user.photoURL);
+            navigate("/dashboard");
           });
         });
       })
