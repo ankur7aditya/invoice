@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function NewInvoices() {
-  const navigater = useNavigate();
+  const navigate = useNavigate();
   const [to, setTo] = useState("");
   const [contact, setContact] = useState("");
   const [address, setAddress] = useState("");
@@ -13,6 +13,7 @@ function NewInvoices() {
   const [quantity, setQuantity] = useState("");
   const [invoice, setInvoice] = useState([]);
   const [total, setTotal] = useState(0);
+  const [error, setError] = useState(null);
 
   const handleAddProduct = () => {
     if (item !== "" && price > 0 && quantity > 0) {
@@ -24,34 +25,57 @@ function NewInvoices() {
       setItem("");
       setPrice("");
       setQuantity("");
+    } else {
+      setError("Please fill out all product fields with valid values.");
     }
   };
 
   const handleDelete = (indexRemove) => {
-    setInvoice((invoice) =>
-      invoice.filter((_, index) => index !== indexRemove)
+    setInvoice((prevInvoice) =>
+      prevInvoice.filter((_, index) => index !== indexRemove)
     );
+    const removedItem = invoice[indexRemove];
+    setTotal(total - removedItem.price * removedItem.quantity);
   };
-  const handleEdit = (indexEdit)=>{
+
+  const handleEdit = (indexEdit) => {
     const obj = invoice[indexEdit];
-    setItem(obj.itemName)
-    setPrice(obj.price)
+    setItem(obj.itemName);
+    setPrice(obj.price);
     setQuantity(obj.quantity);
     handleDelete(indexEdit);
-  }
+  };
 
   const handleSaveData = async () => {
     if (to !== "" && contact !== "" && address !== "" && invoice.length > 0) {
-      const docRef = await addDoc(collection(db, "invoices"), {
-        to: to,
-        contact: contact,
-        address: address,
-        invoice: invoice,
-        total: total,
-        date: Timestamp.fromDate(new Date()),
-      });
-      console.log(docRef);
-      navigater("/dashboard/invoices");
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userId = user.uid;
+          const invoiceData = {
+            to: to,
+            contact: contact,
+            address: address,
+            invoice: invoice,
+            total: total,
+            date: Timestamp.fromDate(new Date()),
+          };
+
+          const docRef = await addDoc(
+            collection(db, `users/${userId}/invoices`),
+            invoiceData
+          );
+          console.log("Invoice stored successfully with ID: ", docRef.id);
+          navigate("/dashboard/invoices");
+        } else {
+          setError("User is not authenticated. Please log in.");
+        }
+      } catch (error) {
+        console.error("Error storing invoice: ", error);
+        setError("Failed to store invoice. Please try again.");
+      }
+    } else {
+      setError("Please fill out all fields and add at least one product.");
     }
   };
 
@@ -59,7 +83,6 @@ function NewInvoices() {
     <>
       <div className="invoice-header flex justify-between mb-4">
         <p className="text-3xl font-bold">New Invoice</p>
-        {/* make save data function */}
         <button
           onClick={handleSaveData}
           className="bg-green-500 p-2 rounded-md hover:bg-blue-900"
@@ -67,6 +90,7 @@ function NewInvoices() {
           Save Data
         </button>
       </div>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="invoice-form1 lg:flex lg:justify-between lg:gap-1 sm:flex-row sm:mt-10">
         <input
           type="text"
@@ -152,30 +176,28 @@ function NewInvoices() {
           </p>
           <p className="font-bold w-1/6 flex-grow overflow-auto break-words"></p>
         </div>
-        <div className="invoice-brief2  items-center mt-5">
+        <div className="invoice-brief2 items-center mt-5">
           {invoice.map((item, index) => (
             <div key={index} className="flex text-gray-800">
-              <p className="font-semibold bg-slate-100  w-1/6 flex-grow overflow-auto break-words">
+              <p className="font-semibold bg-slate-100 w-1/6 flex-grow overflow-auto break-words">
                 {index + 1}
               </p>
-              <p className="font-semibold bg-slate-100  w-1/6 flex-grow overflow-auto break-words">
+              <p className="font-semibold bg-slate-100 w-1/6 flex-grow overflow-auto break-words">
                 {item.itemName}
               </p>
-              <p className="font-semibold bg-slate-100  w-1/6 flex-grow overflow-auto break-words">
+              <p className="font-semibold bg-slate-100 w-1/6 flex-grow overflow-auto break-words">
                 {item.price}
               </p>
-              <p className="font-semibold bg-slate-100  w-1/6 flex-grow overflow-auto break-words">
+              <p className="font-semibold bg-slate-100 w-1/6 flex-grow overflow-auto break-words">
                 {item.quantity}
               </p>
-              <p className="font-semibold bg-slate-100  w-1/6 flex-grow overflow-auto break-words">
+              <p className="font-semibold bg-slate-100 w-1/6 flex-grow overflow-auto break-words">
                 {item.quantity * item.price}
               </p>
               <div className="flex-grow overflow-auto break-words">
                 <button
-                  onClick={() => {
-                    handleEdit(index);
-                  }}
-                  className=" p-2 rounded bg-blue-300 "
+                  onClick={() => handleEdit(index)}
+                  className="p-2 rounded bg-blue-300"
                 >
                   <img
                     src={require("../../Assets/edit.png")}
@@ -184,14 +206,12 @@ function NewInvoices() {
                   />
                 </button>
                 <button
-                  onClick={() => {
-                    handleDelete(index);
-                  }}
-                  className=" p-2 rounded bg-red-700 "
+                  onClick={() => handleDelete(index)}
+                  className="p-2 rounded bg-red-700"
                 >
                   <img
                     src={require("../../Assets/delete.png")}
-                    alt="edit-icon"
+                    alt="delete-icon"
                     className="w-6 h-6"
                   />
                 </button>

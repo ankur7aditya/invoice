@@ -1,9 +1,21 @@
 import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { auth } from "../../firebase";
+import { signOut } from "firebase/auth";
 
 function DashBoard() {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const navigator = useNavigate();
+  const handleLogOut = () => {
+    signOut(auth)
+      .then(() => {
+        localStorage.clear();
+        navigator("/login");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -18,7 +30,9 @@ function DashBoard() {
             className="h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 rounded-full shadow-lg"
           />
           <div>
-            <p className="text-5xl">{localStorage.getItem("user")}</p>
+            <p className="sm:text-xl lg:text-5xl">
+              {localStorage.getItem("user")}
+            </p>
           </div>
         </div>
         <button className="lg:hidden block text-2xl" onClick={toggleMenu}>
@@ -29,7 +43,10 @@ function DashBoard() {
             menuOpen ? "block bg-black" : "hidden "
           } lg:static lg:flex lg:flex-col lg:w-full`}
         >
-          <Link className="no-underline hover:bg-blue-700  py-2 px-4 block text-left" to="">
+          <Link
+            className="no-underline hover:bg-blue-700  py-2 px-4 block text-left"
+            to=""
+          >
             Home
           </Link>
           <Link
@@ -44,14 +61,22 @@ function DashBoard() {
           >
             New Invoices
           </Link>
-          <Link className="no-underline hover:bg-blue-700  py-2 px-4 block text-left" to="setting">
+          <Link
+            className="no-underline hover:bg-blue-700  py-2 px-4 block text-left"
+            to="setting"
+          >
             Settings
           </Link>
-          <button className="bg-gray-500 hover:bg-blue-700  my-5 rounded-lg p-2">Log Out</button>
+          <button
+            onClick={handleLogOut}
+            className="bg-gray-500 hover:bg-blue-700  my-5 rounded-lg p-2"
+          >
+            Log Out
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 bg-gray-300">
         <Outlet />
       </div>
     </div>

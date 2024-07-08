@@ -14,9 +14,17 @@ function Login() {
         console.log(userCredential.user);
         localStorage.setItem("user", userCredential.user.displayName);
         localStorage.setItem("logo", userCredential.user.photoURL);
+        localStorage.setItem("email", userCredential.user.email);
         navigate("/dashboard");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const errorMsg = document.querySelector(".invalid");
+        errorMsg.innerHTML = "Invalid Credential";
+        errorMsg.classList.add("text-red-700");
+        setTimeout(() => {
+          errorMsg.innerHTML = ""; // Clear the message
+        }, 3000);
+      });
   };
   return (
     <>
@@ -65,6 +73,7 @@ function Login() {
                 autoComplete="off"
               />
             </div>
+            <p className="invalid"></p>
 
             {/* <!-- Forgot Password Link --> */}
             {/* <div className="mb-6 text-blue-500">
