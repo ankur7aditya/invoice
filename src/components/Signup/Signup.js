@@ -128,7 +128,11 @@ function Signup() {
               required
             />
           </div>
-          <img className={`rounded-md mb-3 ${imageURL ? 'block' : 'hidden'}`} src={imageURL} alt="company-logo" />
+          <img
+            className={`rounded-md mb-3 ${imageURL ? "block" : "hidden"}`}
+            src={imageURL}
+            alt="company-logo"
+          />
           {/* Sign Up Button */}
           <button
             type="submit"
