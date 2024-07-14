@@ -12,6 +12,7 @@ function Signup() {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [imageURL, setImageURL] = useState(null);
+  const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSetFile = (e) => {
@@ -20,6 +21,7 @@ function Signup() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const newUser = await createUserWithEmailAndPassword(
         auth,
@@ -47,7 +49,9 @@ function Signup() {
       localStorage.setItem("logo", url);
       localStorage.setItem("email", email);
       navigate("/dashboard");
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       console.error("Error during sign up:", err);
       setError("Failed to create an account. Please try again.");
     }
@@ -138,6 +142,7 @@ function Signup() {
             type="submit"
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
           >
+            {isLoading && <i className="fa-solid fa-spinner fa-spin-pulse"></i>}
             Sign Up
           </button>
         </form>

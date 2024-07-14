@@ -6,7 +6,7 @@ import { doc, updateDoc } from "firebase/firestore";
 
 function Setting() {
   const inputRef = useRef(null);
-  // const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(localStorage.getItem("email"));
   // const [password, setPassword] = useState("");
   const [companyName, setCompanyName] = useState(localStorage.getItem("user"));
   const [file, setFile] = useState(null);
@@ -14,6 +14,7 @@ function Setting() {
   const [imageURL, setImageURL] = useState(localStorage.getItem("logo"));
   const [display, setDisplay] = useState(false);
   const [inputDisplay, setInputDisplay] = useState(false);
+  const [inputEmailDisplay, setInputEmailDisplay] = useState(false);
 
   //Functions to update logo
   const displayEditLogo = () => {
@@ -43,7 +44,7 @@ function Setting() {
     const user = auth.currentUser;
     updateProfile(user, {
       displayName: companyName,
-    }).then(async() => {
+    }).then(async () => {
       setInputDisplay(false);
       localStorage.setItem("user", companyName);
       await updateDoc(doc(db, "users", user.uid), {
@@ -53,9 +54,19 @@ function Setting() {
     });
   };
 
+  // Function for updating company email address
+  const handleEmailChange = () => {
+    setInputEmailDisplay(true);
+  };
+  // TODO:Complete this function
+  const updateEmail = () => {
+    console.log(email);
+    setInputEmailDisplay(false);
+  };
+
   return (
     <>
-      <div className="container bg-white rounded-3xl">
+      <div className="container bg-white rounded-3xl p-5">
         {/* Update Company Logo */}
         <div className="image-section flex flex-col items-center mb-5 sm:mt-5 py-3">
           <img
@@ -85,7 +96,7 @@ function Setting() {
         </div>
 
         {/* Update comapany name */}
-        <div className="name-section flex flex-col items-center">
+        <div className="name-section flex flex-col items-center ">
           <div className="lg:flex lg:justify-center">
             <p className="text-xl">Company Name:</p>
             <p
@@ -108,9 +119,45 @@ function Setting() {
 
           <button
             onClick={updateCompanyName}
-            className="bg-blue-700 rounded-lg p-2 my-3 text-white"
+            className={`bg-blue-700 rounded-lg p-2 my-5 text-white ${
+              inputDisplay ? "block" : "hidden"
+            }`}
           >
             Update Company Name
+          </button>
+        </div>
+
+        {/* TODO:Update email address */}
+        <div className="name-section flex flex-col items-center my-5">
+          <div className="lg:flex lg:justify-center">
+            <p className="text-xl">Email Address:</p>
+            <p
+              onClick={handleEmailChange}
+              className={`text-2xl font-bold cursor-text ${
+                inputEmailDisplay ? "hidden" : "block"
+              }`}
+            >
+              {email}
+            </p>
+            <input
+              type="text"
+              name="new-companyName"
+              id="newCName"
+              className={`bg-gray-200 ${
+                inputEmailDisplay ? "block" : "hidden"
+              }`}
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+            />
+          </div>
+
+          <button
+            onClick={updateEmail}
+            className={`bg-blue-700 rounded-lg p-2 my-5 text-white ${
+              inputEmailDisplay ? "block" : "hidden"
+            }`}
+          >
+            Update Email Address
           </button>
         </div>
       </div>

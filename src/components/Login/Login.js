@@ -6,9 +6,12 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 function Login() {
   const [email, setEmail] = new useState("");
   const [password, setPassword] = new useState("");
+  const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential.user);
@@ -16,8 +19,10 @@ function Login() {
         localStorage.setItem("logo", userCredential.user.photoURL);
         localStorage.setItem("email", userCredential.user.email);
         navigate("/dashboard");
+        setLoading(false);
       })
       .catch((err) => {
+        setLoading(false);
         const errorMsg = document.querySelector(".invalid");
         errorMsg.innerHTML = "Invalid Credential";
         errorMsg.classList.add("text-red-700");
@@ -47,7 +52,8 @@ function Login() {
                 Email
               </label>
               <input
-                type="text"
+                required
+                type="email"
                 id="username"
                 name="username"
                 onChange={(e) => {
@@ -63,6 +69,7 @@ function Login() {
                 Password
               </label>
               <input
+                required
                 type="password"
                 id="password"
                 name="password"
@@ -86,6 +93,9 @@ function Login() {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
             >
+              {isLoading && (
+                <i className="fa-solid fa-spinner fa-spin-pulse"></i>
+              )}
               Login
             </button>
           </form>

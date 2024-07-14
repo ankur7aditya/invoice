@@ -33,7 +33,7 @@ const App = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center"><i className="text-5xl fa-solid fa-spinner fa-spin-pulse"></i></div>;
   }
 
   return (
